@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アンケート</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&family=Noto+Serif+JP:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color-start: #fdfcf8;
+    --bg-color-end: #f3eee7;
+    --text-color: #4a3b32;
+    --accent-color: #cca37a;
+    --accent-hover: #b38a63;
+    --card-bg: #ffffff;
+    --border-color: #e0d5cc;
+    --font-serif: 'Noto Serif JP', serif;
+    --font-sans: 'Noto Sans JP', sans-serif;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--text-color);
+    background: linear-gradient(135deg, var(--bg-color-start), var(--bg-color-end));
+    margin: 0;
+    padding: 30px 20px;
+    min-height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #survey-container, #thanks-container {
+    background-color: var(--card-bg);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(74, 59, 50, 0.1);
+    max-width: 640px;
+    width: 100%;
+    margin: auto;
+    border: 1px solid #f0ece6;
+  }
+
+  h1.form-title {
+    text-align: center;
+    font-family: var(--font-serif);
+    color: var(--text-color);
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-weight: 600;
+  }
+
+  .question { margin-bottom: 35px; }
+
+  .question p {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    line-height: 1.5;
+  }
+
+  .radio-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .radio-group label {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-color);
+    width: 50px;
+  }
+
+  .radio-group input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    position: absolute;
+  }
+
+  .radio-group label::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+    background-color: #fff;
+  }
+
+  .radio-group label:hover::before {
+    border-color: var(--accent-color);
+    background-color: #fffaf5;
+  }
+
+  .radio-group input[type="radio"]:checked + label::before {
+    border-color: var(--accent-color);
+    background-color: var(--accent-color);
+    box-shadow: inset 0 0 0 4px #fff;
+  }
+  
+  .radio-group input[type="radio"]:checked + label {
+      color: var(--accent-color);
+  }
+
+  #free-text-label {
+    color: var(--text-color);
+  }
+
+  textarea {
+    width: 100%;
+    height: 120px;
+    box-sizing: border-box;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    color: var(--text-color);
+    background-color: #fdfcfb;
+    resize: vertical;
+    transition: border-color 0.3s;
+  }
+
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background-color: #fff;
+    box-shadow: 0 0 0 2px rgba(204, 163, 122, 0.2);
+  }
+
+  button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    font-family: var(--font-serif);
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(to right, var(--accent-color), var(--accent-hover));
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(204, 163, 122, 0.3);
+    margin-top: 30px;
+    letter-spacing: 0.05em;
+  }
+
+  button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(204, 163, 122, 0.4);
+    background: linear-gradient(to right, var(--accent-hover), var(--accent-color));
+  }
+
+  button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+    color: #eee;
+  }
+
+  #thanks-container {
+    text-align: center;
+    padding: 50px 40px;
+  }
+
+  #thanks-container p {
+    font-family: var(--font-serif);
+    font-size: 1.2rem;
+    line-height: 1.8;
+    margin-bottom: 30px;
+  }
+
+  .hidden { display: none !important; }
+
+</style>
+</head>
+<body>
+
+<div id="survey-container">
+  <h1 class="form-title">アンケートフォーム</h1>
+  <form id="surveyForm">
+    <div class="question">
+      <p>Q1: お悩みの解決や目標に近づけたと感じましたか？</p>
+      <div class="radio-group" id="q1-group"></div>
+    </div>
+    <div class="question">
+      <p>Q2: サービスの質にはご満足いただけましたか？</p>
+      <div class="radio-group" id="q2-group"></div>
+    </div>
+    <div class="question">
+      <p>Q3: 料金はサービスに対して適正でしたか？</p>
+      <div class="radio-group" id="q3-group"></div>
+    </div>
+    <div class="question">
+      <p>Q4: 体の調子は良くなりましたか？</p>
+      <div class="radio-group" id="q4-group"></div>
+    </div>
+    <div class="question">
+      <p>Q5: 接客対応や、目標達成へ寄り添う姿勢はご満足いただけましたか？</p>
+      <div class="radio-group" id="q5-group"></div>
+    </div>
+    <div class="question">
+      <p>Q6: 店内の清潔感はご満足いただけましたか？</p>
+      <div class="radio-group" id="q6-group"></div>
+    </div>
+    <div class="question">
+      <p>Q7: 当サービスを同じようなお悩み・目標をお持ちの方へおすすめしたいですか？</p>
+      <div class="radio-group" id="q7-group"></div>
+    </div>
+
+    <div class="question">
+      <p id="free-text-label">ご意見・ご要望などをご自由にお書きください。</p>
+      <textarea id="freeText" name="freeText" placeholder="こちらに入力してください"></textarea>
+    </div>
+
+    <button type="submit" id="submitBtn">送信する</button>
+  </form>
+</div>
+
+<div id="thanks-container" class="hidden">
+  <div id="high-score-thanks" class="hidden">
+    <p>アンケートのご協力誠にありがとうございます。<br>お客様の温かいお言葉が、スタッフ一同の励みとなります。<br>よろしければ、口コミでぜひ応援していただけますと幸いです。</p>
+    <button id="reviewBtn">口コミを投稿する</button>
+  </div>
+  <div id="low-score-thanks" class="hidden">
+    <p>アンケートのご協力ありがとうございました。<br>貴重なご意見を参考に、サービスの向上に努めてまいります。<br>またのご利用を心よりお待ちしております。</p>
+  </div>
+</div>
+
+<script>
+  const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzuZFzVuZh9zJalAap6K3Q9kUtOB2VkTH-jfsZPnGKNYKvI22vBBF4eBISSiXm3LKSw/exec';
+  const GOOGLE_MAP_REVIEW_URL = 'https://g.page/r/CUmzVZ6imGReEAE/review';
+
+  const defaultLabel = "ご意見・ご要望などをご自由にお書きください。";
+  let currentTotalScore = 0;
+  let currentResultLabel = "-";
+
+  function createRadios(id) {
+    const group = document.getElementById(id + '-group');
+    for (let i = 1; i <= 5; i++) {
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.id = id + '-' + i;
+      radio.name = id;
+      radio.value = i;
+      radio.required = true;
+      radio.addEventListener('change', updateForm);
+      group.appendChild(radio);
+
+      const label = document.createElement('label');
+      label.setAttribute('for', id + '-' + i);
+      label.appendChild(document.createTextNode(i));
+      group.appendChild(label);
+    }
+  }
+
+  ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7'].forEach(createRadios);
+
+  function getVal(name) {
+    const ele = document.querySelector(`input[name="${name}"]:checked`);
+    return ele ? parseInt(ele.value) : 0;
+  }
+
+  function updateForm() {
+    const q1 = getVal('q1');
+    const q2 = getVal('q2');
+    const q3 = getVal('q3');
+    const q4 = getVal('q4');
+    const q5 = getVal('q5');
+    const q6 = getVal('q6');
+    const q7 = getVal('q7');
+
+    if (!q1 || !q2 || !q3 || !q4 || !q5 || !q6 || !q7) return;
+
+    currentTotalScore = q1 + q2 + q3 + q4 + q5 + q6 + q7;
+    const freeText = document.getElementById('freeText');
+    const freeTextLabel = document.getElementById('free-text-label');
+
+    if (currentTotalScore >= 18) {
+      freeText.required = true;
+      const result = calculateScore(q1, q2, q3, q4, q5, q6, q7);
+      currentResultLabel = result.category;
+      freeTextLabel.innerHTML = `${result.label}<br><span style="font-size:0.9em; color:var(--accent-color);">（※必須）</span>`;
+    } else {
+      freeText.required = false;
+      currentResultLabel = "-";
+      freeTextLabel.innerHTML = `${defaultLabel}<br><span style="font-size:0.9em; color:#888;">（任意）</span>`;
+    }
+  }
+
+  function calculateScore(q1, q2, q3, q4, q5, q6, q7) {
+    const scores = [
+      { category: 'A', score: q1 * 1.5, priority: 1, label: '当初のお悩みがどのように変化したか、同じお悩みを持つ方への励ましのメッセージとしてご体験をお聞かせください' },
+      { category: 'E', score: q7 * 1.5, priority: 2, label: '当施設をご家族やご友人にお勧めするとしたら、どのような言葉（魅力）を伝えますか？' },
+      { category: 'B', score: q2 * 1.2, priority: 3, label: '当施設の施術やトレーニング指導で、特に効果を感じた点や優れていると感じたポイントをお聞かせください' },
+      { category: 'C', score: q5 * 1.2, priority: 4, label: '担当スタッフの対応やサポートの中で、特に印象に残っているエピソードや嬉しかったことをお聞かせください' },
+      { category: 'D', score: q6 * 1.0, priority: 5, label: '施設内でリラックスできた点や、安心して過ごせたポイントについてお聞かせください' },
+      { category: 'F', score: q3 * 0.5, priority: 6, label: '料金とサービス内容に関するご意見をお聞かせください' },
+      { category: 'G', score: q4 * 0.5, priority: 7, label: 'お身体の変化について、具体的に良くなった点をお聞かせください' }
+    ];
+
+    scores.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.priority - b.priority;
+    });
+
+    return scores[0];
+  }
+
+  document.getElementById('surveyForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '送信中...';
+
+    const data = new URLSearchParams();
+    data.append('q1', getVal('q1'));
+    data.append('q2', getVal('q2'));
+    data.append('q3', getVal('q3'));
+    data.append('q4', getVal('q4'));
+    data.append('q5', getVal('q5'));
+    data.append('q6', getVal('q6'));
+    data.append('q7', getVal('q7'));
+    data.append('total', currentTotalScore);
+    data.append('resultCategory', currentResultLabel);
+    data.append('freeText', document.getElementById('freeText').value);
+
+    fetch(GAS_WEB_APP_URL, {
+      method: 'POST',
+      body: data
+    }).then(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.getElementById('survey-container').classList.add('hidden');
+      document.getElementById('thanks-container').classList.remove('hidden');
+
+      if (currentTotalScore >= 18) {
+        document.getElementById('high-score-thanks').classList.remove('hidden');
+      } else {
+        document.getElementById('low-score-thanks').classList.remove('hidden');
+      }
+    }).catch(err => {
+      alert('通信エラーが発生しました。時間をおいて再度お試しください。');
+      btn.disabled = false;
+      btn.textContent = '送信する';
+    });
+  });
+
+  document.getElementById('reviewBtn').addEventListener('click', function() {
+    const text = document.getElementById('freeText').value;
+    const originalText = this.textContent;
+    this.textContent = '投稿画面へ移動します...';
+    
+    setTimeout(() => {
+        navigator.clipboard.writeText(text).then(() => {
+          window.location.href = GOOGLE_MAP_REVIEW_URL;
+        }).catch(() => {
+          window.location.href = GOOGLE_MAP_REVIEW_URL;
+        });
+        this.textContent = originalText;
+    }, 1000);
+  });
+</script>
+</body>
+</html>
