@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アンケート</title>
+<style>
+  body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+  .question { margin-bottom: 25px; }
+  .radio-group { display: flex; gap: 15px; }
+  textarea { width: 100%; height: 120px; box-sizing: border-box; }
+  #thanks-container { text-align: center; margin-top: 50px; }
+  .hidden { display: none; }
+  button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div id="survey-container">
+  <form id="surveyForm">
+    <div class="question">
+      <p>Q1: お悩みの解決や目標に近づけたと感じましたか？</p>
+      <div class="radio-group" id="q1-group"></div>
+    </div>
+    <div class="question">
+      <p>Q2: サービスの質にはご満足いただけましたか？</p>
+      <div class="radio-group" id="q2-group"></div>
+    </div>
+    <div class="question">
+      <p>Q3: 接客対応や、目標達成へ寄り添う姿勢はご満足いただけましたか？</p>
+      <div class="radio-group" id="q3-group"></div>
+    </div>
+    <div class="question">
+      <p>Q4: 店内の清潔感はご満足いただけましたか？</p>
+      <div class="radio-group" id="q4-group"></div>
+    </div>
+    <div class="question">
+      <p>Q5: 当サービスを同じようなお悩み・目標をお持ちの方へおすすめしたいですか？</p>
+      <div class="radio-group" id="q5-group"></div>
+    </div>
+
+    <div class="question">
+      <p id="free-text-label">ご意見・ご要望などをご自由にお書きください。</p>
+      <textarea id="freeText" name="freeText"></textarea>
+    </div>
+
+    <button type="submit" id="submitBtn">送信</button>
+  </form>
+</div>
+
+<div id="thanks-container" class="hidden">
+  <div id="high-score-thanks" class="hidden">
+    <p>アンケートのご協力誠にありがとうございます！<br>よろしければ口コミでぜひ応援してください！</p>
+    <button id="reviewBtn">口コミを投稿する</button>
+  </div>
+  <div id="low-score-thanks" class="hidden">
+    <p>アンケートのご協力ありがとうございました！<br>またのご利用をお待ちしております！</p>
+  </div>
+</div>
+
+<script>
+  const GAS_WEB_APP_URL = 'YOUR_GAS_WEB_APP_URL_HERE';
+  const GOOGLE_MAP_REVIEW_URL = 'YOUR_GOOGLE_MAP_REVIEW_URL_HERE';
+
+  const defaultLabel = "ご意見・ご要望などをご自由にお書きください。";
+  let currentTotalScore = 0;
+  let currentResultLabel = "-";
+
+  function createRadios(id) {
+    const group = document.getElementById(id + '-group');
+    for (let i = 1; i <= 5; i++) {
+      const label = document.createElement('label');
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = id;
+      radio.value = i;
+      radio.required = true;
+      radio.addEventListener('change', updateForm);
+      label.appendChild(radio);
+      label.appendChild(document.createTextNode(i));
+      group.appendChild(label);
+    }
+  }
+
+  ['q1', 'q2', 'q3', 'q4', 'q5'].forEach(createRadios);
+
+  function getVal(name) {
+    const ele = document.querySelector(`input[name="${name}"]:checked`);
+    return ele ? parseInt(ele.value) : 0;
+  }
+
+  function updateForm() {
+    const q1 = getVal('q1');
+    const q2 = getVal('q2');
+    const q3 = getVal('q3');
+    const q4 = getVal('q4');
+    const q5 = getVal('q5');
+
+    if (!q1 || !q2 || !q3 || !q4 || !q5) return;
+
+    currentTotalScore = q1 + q2 + q3 + q4 + q5;
+    const freeText = document.getElementById('freeText');
+    const freeTextLabel = document.getElementById('free-text-label');
+
+    if (currentTotalScore >= 18) {
+      freeText.required = true;
+      const result = calculateScore(q1, q2, q3, q4, q5);
+      currentResultLabel = result.category;
+      freeTextLabel.textContent = result.label + "（必須）";
+    } else {
+      freeText.required = false;
+      currentResultLabel = "-";
+      freeTextLabel.textContent = defaultLabel + "（任意）";
+    }
+  }
+
+  function calculateScore(q1, q2, q3, q4, q5) {
+    const scores = [
+      { category: 'A', score: q1 * 1.5, priority: 1, label: '当初のお悩みがどのように変化したか、同じお悩みを持つ方への励ましのメッセージとしてご体験をお聞かせください' },
+      { category: 'E', score: q5 * 1.5, priority: 2, label: '当施設をご家族やご友人にお勧めするとしたら、どのような言葉（魅力）を伝えますか？' },
+      { category: 'B', score: q2 * 1.2, priority: 3, label: '当施設の施術やトレーニング指導で、特に効果を感じた点や優れていると感じたポイントをお聞かせください' },
+      { category: 'C', score: q3 * 1.2, priority: 4, label: '担当スタッフの対応やサポートの中で、特に印象に残っているエピソードや嬉しかったことをお聞かせください' },
+      { category: 'D', score: q4 * 1.0, priority: 5, label: '施設内でリラックスできた点や、安心して過ごせたポイントについてお聞かせください' }
+    ];
+
+    scores.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.priority - b.priority;
+    });
+
+    return scores[0];
+  }
+
+  document.getElementById('surveyForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '送信中...';
+
+    const data = new URLSearchParams();
+    data.append('q1', getVal('q1'));
+    data.append('q2', getVal('q2'));
+    data.append('q3', getVal('q3'));
+    data.append('q4', getVal('q4'));
+    data.append('q5', getVal('q5'));
+    data.append('total', currentTotalScore);
+    data.append('resultCategory', currentResultLabel);
+    data.append('freeText', document.getElementById('freeText').value);
+
+    fetch(GAS_WEB_APP_URL, {
+      method: 'POST',
+      body: data
+    }).then(() => {
+      document.getElementById('survey-container').classList.add('hidden');
+      document.getElementById('thanks-container').classList.remove('hidden');
+
+      if (currentTotalScore >= 18) {
+        document.getElementById('high-score-thanks').classList.remove('hidden');
+      } else {
+        document.getElementById('low-score-thanks').classList.remove('hidden');
+      }
+    }).catch(err => {
+      alert('通信エラーが発生しました。');
+      btn.disabled = false;
+      btn.textContent = '送信';
+    });
+  });
+
+  document.getElementById('reviewBtn').addEventListener('click', function() {
+    const text = document.getElementById('freeText').value;
+    navigator.clipboard.writeText(text).then(() => {
+      window.location.href = GOOGLE_MAP_REVIEW_URL;
+    }).catch(() => {
+      // クリップボードAPIが使用できない環境用フォールバック
+      window.location.href = GOOGLE_MAP_REVIEW_URL;
+    });
+  });
+</script>
+</body>
+</html>
