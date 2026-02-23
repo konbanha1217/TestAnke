@@ -175,14 +175,22 @@
 
   #thanks-container {
     text-align: center;
-    padding: 50px 40px;
+    padding: 40px 20px;
   }
 
   #thanks-container p {
     font-family: var(--font-serif);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     line-height: 1.8;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
+  }
+
+  .copy-notice {
+    font-family: var(--font-sans) !important;
+    font-size: 0.85rem !important;
+    color: #666 !important;
+    margin-top: 30px !important;
+    margin-bottom: 10px !important;
   }
 
   .hidden { display: none !important; }
@@ -234,11 +242,16 @@
 
 <div id="thanks-container" class="hidden">
   <div id="high-score-thanks" class="hidden">
-    <p>アンケートのご協力誠にありがとうございます。<br>お客様の温かいお言葉が、スタッフ一同の励みとなります。<br>よろしければ、口コミでぜひ応援していただけますと幸いです。</p>
+    <p>アンケートのご協力<br>誠にありがとうございます。</p>
+    <p>お客様の温かいお言葉が、<br>スタッフ一同の励みとなります。</p>
+    <p>よろしければ、口コミでぜひ<br>応援していただけますと幸いです。</p>
+    <p class="copy-notice">※ボタンを押すとアンケート内容がコピーされます。</p>
     <button id="reviewBtn">口コミを投稿する</button>
   </div>
   <div id="low-score-thanks" class="hidden">
-    <p>アンケートのご協力ありがとうございました。<br>貴重なご意見を参考に、サービスの向上に努めてまいります。<br>またのご利用を心よりお待ちしております。</p>
+    <p>アンケートのご協力<br>ありがとうございました。</p>
+    <p>貴重なご意見を参考に、<br>サービスの向上に努めてまいります。</p>
+    <p>またのご利用を心より<br>お待ちしております。</p>
   </div>
 </div>
 
@@ -377,6 +390,4 @@
   });
 </script>
 </body>
-
 </html>
-
